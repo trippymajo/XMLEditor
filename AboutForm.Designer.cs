@@ -39,7 +39,7 @@ namespace XMLEditor
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(182, 13);
 			this.label1.TabIndex = 0;
-			this.label1.Text = "XMLEditor v.0.1 made by Elya (2022)";
+			this.label1.Text = "XMLEditor v.1.0 made by Elya (2022)";
 			// 
 			// AboutForm
 			// 

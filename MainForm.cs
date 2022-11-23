@@ -17,7 +17,7 @@ namespace XMLEditor
 		string filePath = string.Empty;
 		CustomTreeNode root = new CustomTreeNode();
 		CustomTreeNode selectedTreeItem = null;
-
+		ListViewItemSelectionChangedEventArgs selectedViewItem = null;
 		// Classes:
 		public class CustomTreeNode : TreeNode
 		{
@@ -86,12 +86,25 @@ namespace XMLEditor
 		{
 			CustomTreeNode node = selectedTreeItem;
 			XNamespace XNs = node.xElement.Name.Namespace;
+			ListViewItem item = selectedViewItem.Item;
+			if (item.SubItems[0].Text.ToLower().Equals("<text>"))
+			{
+				selectedTreeItem.xElement.SetValue(inputBox.Text);
+			}
+			else
+			{
+				node.xElement.SetAttributeValue(XNs + item.SubItems[0].Text, inputBox.Text);
+			}
+			root.xElement.Save(filePath);
+			getTextFromXml(node); ;
+			listView.Focus();
+
 		}
 
-		private void getTextFromXml(TreeViewEventArgs e)
+		private void getTextFromXml(CustomTreeNode selectedTreeItem)
 		{
 			listView.Items.Clear();
-			CustomTreeNode selected = (CustomTreeNode)e.Node;
+			CustomTreeNode selected = selectedTreeItem;
 			ListViewItem item = null;
 			if (!selected.xElement.HasElements)
 			{
@@ -118,13 +131,19 @@ namespace XMLEditor
 		private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
 		{
 			selectedTreeItem = (CustomTreeNode)e.Node;
-			getTextFromXml(e);
+			getTextFromXml(selectedTreeItem);
 		}
 
 		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			AboutForm AboutForm = new AboutForm();
 			AboutForm.ShowDialog();
+		}
+
+		private void listView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+		{
+			selectedViewItem = e;
+			inputBox.Text = e.Item.SubItems[1].Text;
 		}
 	}
 }

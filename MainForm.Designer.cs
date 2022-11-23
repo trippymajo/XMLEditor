@@ -32,7 +32,6 @@ namespace XMLEditor
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.openXmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.saveXmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.Label1 = new System.Windows.Forms.Label();
 			this.inputBox = new System.Windows.Forms.TextBox();
@@ -58,8 +57,7 @@ namespace XMLEditor
 			// toolStripMenuItem1
 			// 
 			this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openXmlToolStripMenuItem,
-            this.saveXmlToolStripMenuItem});
+            this.openXmlToolStripMenuItem});
 			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
 			this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
 			this.toolStripMenuItem1.Text = "File";
@@ -70,12 +68,6 @@ namespace XMLEditor
 			this.openXmlToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
 			this.openXmlToolStripMenuItem.Text = "Open Xml...";
 			this.openXmlToolStripMenuItem.Click += new System.EventHandler(this.openXmlToolStripMenuItem_Click);
-			// 
-			// saveXmlToolStripMenuItem
-			// 
-			this.saveXmlToolStripMenuItem.Name = "saveXmlToolStripMenuItem";
-			this.saveXmlToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
-			this.saveXmlToolStripMenuItem.Text = "Save Xml";
 			// 
 			// aboutToolStripMenuItem
 			// 
@@ -134,6 +126,7 @@ namespace XMLEditor
 			this.listView.TabIndex = 6;
 			this.listView.UseCompatibleStateImageBehavior = false;
 			this.listView.View = System.Windows.Forms.View.Details;
+			this.listView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listView_ItemSelectionChanged);
 			// 
 			// columnAttribute
 			// 
@@ -171,7 +164,6 @@ namespace XMLEditor
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
 		private System.Windows.Forms.ToolStripMenuItem openXmlToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem saveXmlToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
 		private System.Windows.Forms.Label Label1;
 		private System.Windows.Forms.TextBox inputBox;
