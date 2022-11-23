@@ -34,6 +34,13 @@ namespace XMLEditor
 			this.openXmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveXmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.Label1 = new System.Windows.Forms.Label();
+			this.inputBox = new System.Windows.Forms.TextBox();
+			this.EditBtn = new System.Windows.Forms.Button();
+			this.treeView = new System.Windows.Forms.TreeView();
+			this.listView = new System.Windows.Forms.ListView();
+			this.columnAttribute = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -44,7 +51,7 @@ namespace XMLEditor
             this.aboutToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(684, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -77,11 +84,77 @@ namespace XMLEditor
 			this.aboutToolStripMenuItem.Text = "About";
 			this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
 			// 
+			// Label1
+			// 
+			this.Label1.AutoSize = true;
+			this.Label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.Label1.Location = new System.Drawing.Point(8, 377);
+			this.Label1.Name = "Label1";
+			this.Label1.Size = new System.Drawing.Size(91, 20);
+			this.Label1.TabIndex = 2;
+			this.Label1.Text = "Translation:";
+			// 
+			// inputBox
+			// 
+			this.inputBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.inputBox.Location = new System.Drawing.Point(12, 403);
+			this.inputBox.Name = "inputBox";
+			this.inputBox.Size = new System.Drawing.Size(565, 26);
+			this.inputBox.TabIndex = 3;
+			// 
+			// EditBtn
+			// 
+			this.EditBtn.Location = new System.Drawing.Point(594, 403);
+			this.EditBtn.Name = "EditBtn";
+			this.EditBtn.Size = new System.Drawing.Size(75, 26);
+			this.EditBtn.TabIndex = 4;
+			this.EditBtn.Text = "Edit";
+			this.EditBtn.UseVisualStyleBackColor = true;
+			this.EditBtn.Click += new System.EventHandler(this.EditBtn_Click);
+			// 
+			// treeView
+			// 
+			this.treeView.Location = new System.Drawing.Point(12, 50);
+			this.treeView.Name = "treeView";
+			this.treeView.Size = new System.Drawing.Size(300, 320);
+			this.treeView.TabIndex = 5;
+			this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
+			// 
+			// listView
+			// 
+			this.listView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnAttribute,
+            this.columnText});
+			this.listView.FullRowSelect = true;
+			this.listView.GridLines = true;
+			this.listView.HideSelection = false;
+			this.listView.Location = new System.Drawing.Point(332, 50);
+			this.listView.Name = "listView";
+			this.listView.Size = new System.Drawing.Size(330, 320);
+			this.listView.TabIndex = 6;
+			this.listView.UseCompatibleStateImageBehavior = false;
+			this.listView.View = System.Windows.Forms.View.Details;
+			// 
+			// columnAttribute
+			// 
+			this.columnAttribute.Text = "Attribute";
+			this.columnAttribute.Width = 100;
+			// 
+			// columnText
+			// 
+			this.columnText.Text = "Text";
+			this.columnText.Width = 230;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(800, 450);
+			this.ClientSize = new System.Drawing.Size(684, 450);
+			this.Controls.Add(this.listView);
+			this.Controls.Add(this.treeView);
+			this.Controls.Add(this.EditBtn);
+			this.Controls.Add(this.inputBox);
+			this.Controls.Add(this.Label1);
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
@@ -100,6 +173,13 @@ namespace XMLEditor
 		private System.Windows.Forms.ToolStripMenuItem openXmlToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem saveXmlToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+		private System.Windows.Forms.Label Label1;
+		private System.Windows.Forms.TextBox inputBox;
+		private System.Windows.Forms.Button EditBtn;
+		private System.Windows.Forms.TreeView treeView;
+		private System.Windows.Forms.ListView listView;
+		private System.Windows.Forms.ColumnHeader columnAttribute;
+		private System.Windows.Forms.ColumnHeader columnText;
 	}
 }
 
