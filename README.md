@@ -1,3 +1,3 @@
 # XMLEditor
 
-The project with UI using WinForms, which designed to read definite xml template. But could be useful after few editing the code. 
+The project with UI using WinForms, which designed to read xml files. Its configured to read only Text= items and the text information of the tag construction.
