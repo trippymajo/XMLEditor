@@ -35,11 +35,12 @@ namespace XMLEditor
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(111, 71);
+			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.label1.Location = new System.Drawing.Point(86, 65);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(182, 13);
+			this.label1.Size = new System.Drawing.Size(233, 25);
 			this.label1.TabIndex = 0;
-			this.label1.Text = "XMLEditor v.1.0 made by Elya (2022)";
+			this.label1.Text = "XMLEditor v.0.2 (made in 2022)";
 			// 
 			// AboutForm
 			// 

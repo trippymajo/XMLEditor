@@ -44,6 +44,20 @@ namespace XMLEditor
 			InitializeComponent();
 		}
 
+		private bool isIgnored(string xElementName)
+		{
+			switch (xElementName)
+			{
+				case "RibbonSeparator": return true;
+				case "RibbonTabSelector": return true;
+				case "RibbonPanelSourceReference": return true;
+				case "DialogBoxLauncher": return true;
+				case "RibbonPanelBreak": return true;
+				case "RibbonTabSelectors": return true;
+				default: return false;
+			}
+		}
+
 		private void makeXmlTree(string filePath)
 		{
 			XElement xmlDoc;
@@ -62,10 +76,12 @@ namespace XMLEditor
 			foreach (XElement item in element.Elements())
 			{
 				//                ListItems.Items.Add(item.Value, "TRUE".Equals(item.Attribute("checked").Value.ToUpper()));
-				node = new CustomTreeNode(item.Name.LocalName.ToString(), item);
-				root.Nodes.Add(node);
-				getEveryNode(node, item);
-
+				if (!isIgnored(item.Name.ToString()))
+				{
+					node = new CustomTreeNode(item.Name.LocalName.ToString(), item);
+					root.Nodes.Add(node);
+					getEveryNode(node, item);
+				}
 			}
 		}
 
@@ -130,6 +146,7 @@ namespace XMLEditor
 
 		private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
 		{
+			inputBox.Clear();
 			selectedTreeItem = (CustomTreeNode)e.Node;
 			getTextFromXml(selectedTreeItem);
 		}

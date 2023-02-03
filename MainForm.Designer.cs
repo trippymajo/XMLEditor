@@ -106,6 +106,7 @@ namespace XMLEditor
 			// 
 			// treeView
 			// 
+			this.treeView.HideSelection = false;
 			this.treeView.Location = new System.Drawing.Point(12, 50);
 			this.treeView.Name = "treeView";
 			this.treeView.Size = new System.Drawing.Size(300, 320);
@@ -151,7 +152,7 @@ namespace XMLEditor
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
-			this.Text = "XMLEditor v0.1";
+			this.Text = "XMLEditor v0.2";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);
