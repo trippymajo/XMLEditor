@@ -13,7 +13,7 @@ namespace XMLEditor
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
+			Application.Run(new XMLEditor.View.MainForm());
 		}
 
 	}
