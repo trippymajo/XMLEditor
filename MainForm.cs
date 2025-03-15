@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace XMLEditor
@@ -14,12 +15,22 @@ namespace XMLEditor
 	public partial class MainForm : Form
 	{
 		// Varibales:
-		string filePath = string.Empty;
-		CustomTreeNode root = new CustomTreeNode();
-		CustomTreeNode selectedTreeItem = null;
-		ListViewItemSelectionChangedEventArgs selectedViewItem = null;
-		// Classes:
-		public class CustomTreeNode : TreeNode
+		private const int MAX_HISTORY = 50;
+		private string filePath = string.Empty;
+		private CustomTreeNode root = new CustomTreeNode();
+		private CustomTreeNode selectedTreeItem = null;
+		private ListViewItemSelectionChangedEventArgs selectedViewItem = null;
+		private Stack<XElement> undoStack = new Stack<XElement>();
+		private Stack<XElement> redoStack = new Stack<XElement>();
+
+		private static readonly HashSet<string> IgnoredElements = new HashSet<string>
+		{
+			"RibbonSeparator", "RibbonTabSelector", "RibbonPanelSourceReference",
+			"DialogBoxLauncher", "RibbonPanelBreak", "RibbonTabSelectors"
+		};
+
+        // Classes:
+        public class CustomTreeNode : TreeNode
 		{
 			public XElement xElement;
 			/*
@@ -44,30 +55,19 @@ namespace XMLEditor
 			InitializeComponent();
 		}
 
-		private bool isIgnored(string xElementName)
-		{
-			switch (xElementName)
-			{
-				case "RibbonSeparator": return true;
-				case "RibbonTabSelector": return true;
-				case "RibbonPanelSourceReference": return true;
-				case "DialogBoxLauncher": return true;
-				case "RibbonPanelBreak": return true;
-				case "RibbonTabSelectors": return true;
-				default: return false;
-			}
-		}
+		private bool isIgnored(string xElementName) => IgnoredElements.Contains(xElementName);
 
 		private void makeXmlTree(string filePath)
 		{
-			XElement xmlDoc;
-			xmlDoc = XElement.Load(filePath);
-			treeView.Nodes.Clear();
-			root = new CustomTreeNode(xmlDoc.Name.LocalName.ToString(), xmlDoc);
-			getEveryNode(root, xmlDoc);
-			treeView.Nodes.Add(root);
-			root.Expand();
-
+			using (XmlReader reader = XmlReader.Create(filePath))
+			{
+				XElement xmlDoc = XElement.Load(reader);
+				treeView.Nodes.Clear();
+				root = new CustomTreeNode(xmlDoc.Name.LocalName, xmlDoc);
+				getEveryNode(root, xmlDoc);
+				treeView.Nodes.Add(root);
+				root.Expand();
+			}
 		}
 
 		private void getEveryNode(CustomTreeNode root, XElement element)
@@ -103,6 +103,14 @@ namespace XMLEditor
 			CustomTreeNode node = selectedTreeItem;
 			XNamespace XNs = node.xElement.Name.Namespace;
 			ListViewItem item = selectedViewItem.Item;
+
+			undoStack.Push(new XElement(node.xElement));
+			if (undoStack.Count > MAX_HISTORY)
+			{
+				undoStack = new Stack<XElement>(undoStack.Reverse().Skip(1).Reverse());
+			}
+			redoStack.Clear();
+
 			if (item.SubItems[0].Text.ToLower().Equals("<text>"))
 			{
 				selectedTreeItem.xElement.SetValue(inputBox.Text);
@@ -111,10 +119,10 @@ namespace XMLEditor
 			{
 				node.xElement.SetAttributeValue(XNs + item.SubItems[0].Text, inputBox.Text);
 			}
-			root.xElement.Save(filePath);
-			getTextFromXml(node); ;
-			listView.Focus();
 
+			root.xElement.Save(filePath);
+			getTextFromXml(node);
+			listView.Focus();
 		}
 
 		private void getTextFromXml(CustomTreeNode selectedTreeItem)
@@ -161,6 +169,37 @@ namespace XMLEditor
 		{
 			selectedViewItem = e;
 			inputBox.Text = e.Item.SubItems[1].Text;
+		}
+
+		private void UndoBttn_Click(object sender, EventArgs e)
+		{
+			if (undoStack.Count > 0)
+			{
+				selectedTreeItem.xElement.ReplaceWith(undoStack.Pop());
+				root.xElement.Save(filePath);
+				getTextFromXml(selectedTreeItem);
+				listView.Focus();
+			}
+		}
+
+		private void RedoBttn_Click(object sender, EventArgs e)
+		{
+			if (redoStack.Count > 0)
+			{
+				undoStack.Push(new XElement(selectedTreeItem.xElement));
+
+				if (undoStack.Count > MAX_HISTORY)
+				{
+					undoStack = new Stack<XElement>(undoStack.Reverse().Skip(1).Reverse());
+				}
+
+				XElement nextState = redoStack.Pop();
+				selectedTreeItem.xElement.ReplaceWith(nextState);
+
+				root.xElement.Save(filePath);
+				getTextFromXml(selectedTreeItem);
+				listView.Focus();
+			}
 		}
 	}
 }
