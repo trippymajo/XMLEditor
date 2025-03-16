@@ -10,7 +10,6 @@ using XMLEditor.View;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 
-// P.S. Problem storing Attribute or value. ALso problem with same thing with Undo/redo
 namespace XMLEditor.Controller
 {
     public class XmlController

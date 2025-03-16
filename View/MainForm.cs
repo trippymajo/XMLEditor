@@ -79,7 +79,7 @@ namespace XMLEditor.View
 
 		private void EditBtn_Click(object sender, EventArgs e)
 		{
-			if (_controller == null || selectedListViewItem == null)
+            if (_controller == null || selectedListViewItem == null)
 			{
 				inputBox.Clear();
 				return;
@@ -91,9 +91,13 @@ namespace XMLEditor.View
 			}
 			else
 			{
+				XName namespaceNameAttr = null;
 				XNamespace XNs = selectedTreeItem.XElement.Name.Namespace;
-				XName namespaceNameAttr = XNs.ToString();
-				namespaceNameAttr += selectedListViewItem.Item.SubItems[0].Text;
+
+				if (string.IsNullOrEmpty(XNs.NamespaceName))
+					namespaceNameAttr = XNs + selectedListViewItem.Item.SubItems[0].Text;
+				else
+					namespaceNameAttr = selectedListViewItem.Item.SubItems[0].Text;
 
 				_controller.UpdateTextAttr(selectedTreeItem.XElement, namespaceNameAttr, inputBox.Text);
 			}
@@ -101,6 +105,10 @@ namespace XMLEditor.View
 
 		public void RefreshText()
 		{
+			// TODO: NEED TO REALOAD THE WHOLE TREE OR
+			// Reload the finding paths of the nodes.
+			//treeView.Refresh();
+
 			listView.Items.Clear();
 			ListViewItem item = null;
 			if (!selectedTreeItem.XElement.HasElements)
