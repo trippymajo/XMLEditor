@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using XMLEditor.Controller;
@@ -17,8 +18,6 @@ namespace XMLEditor.View
 		//private CustomTreeNode root = new CustomTreeNode();
 		private CustomTreeNode selectedTreeItem = null;
 		private ListViewItemSelectionChangedEventArgs selectedListViewItem = null;
-		private Stack<XElement> undoStack = new Stack<XElement>();
-		private Stack<XElement> redoStack = new Stack<XElement>();
 
 		private static readonly HashSet<string> IgnoredElements = new HashSet<string>
 		{
@@ -52,6 +51,8 @@ namespace XMLEditor.View
 			if (elemRoot == null)
 				return;
 
+			selectedTreeItem = null;
+			selectedListViewItem = null;
 			treeView.Nodes.Clear();
 
 			CustomTreeNode treeRoot = new CustomTreeNode(elemRoot.Name.LocalName, elemRoot);
@@ -72,7 +73,7 @@ namespace XMLEditor.View
 
 		private void EditBtn_Click(object sender, EventArgs e)
 		{
-            if (_controller == null || selectedListViewItem == null)
+			if (_controller == null || selectedListViewItem == null)
 			{
 				inputBox.Clear();
 				return;
@@ -98,10 +99,6 @@ namespace XMLEditor.View
 
 		public void RefreshText()
 		{
-			// TODO: NEED TO REALOAD THE WHOLE TREE OR
-			// Reload the finding paths of the nodes.
-			//treeView.Refresh();
-
 			listView.Items.Clear();
 			ListViewItem item = null;
 			if (!selectedTreeItem.XElement.HasElements)
@@ -120,6 +117,58 @@ namespace XMLEditor.View
 					string[] text1 = { attrib.Name.LocalName.ToString(), attrib.Value };
 					item = new ListViewItem(text1);
 					listView.Items.Add(item);
+				}
+			}
+		}
+
+        /// <summary>
+        /// DFS search of the Node in treeView by provided path array
+        /// </summary>
+        /// <param name="nodes">Node to search in</param>
+        /// <param name="pathArray">Path to the node to find</param>
+        /// <param name="level">Current level of the Tree</param>
+        /// <returns>TreeNode found by path</returns>
+        /// <return>[null] - TreeNode was not found</return>
+        private TreeNode FindNode(TreeNodeCollection nodes, string[] pathArray, int level)
+		{
+			foreach (TreeNode node in nodes)
+			{
+				if (node.Text == pathArray[level])
+				{
+					if (level == pathArray.Length - 1)
+						return node;
+					else
+						return FindNode(node.Nodes, pathArray, ++level);
+				}
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Refreshes the tree restoring last expanded and selected item
+		/// </summary>
+		/// <param name="elemRoot">Root element of the document</param>
+		public void RefreshTree(XElement elemRoot)
+		{
+			string nodeFullPath = null;
+
+			if (selectedTreeItem != null)
+				nodeFullPath = selectedTreeItem.FullPath;
+
+			LoadXmlTreeView(elemRoot);
+
+			// Restore selection
+			if (nodeFullPath != null)
+			{
+				string[] pathArray = nodeFullPath.Split(treeView.PathSeparator.ToCharArray());
+				CustomTreeNode nodeToSelect = (CustomTreeNode)FindNode(treeView.Nodes, pathArray, 0);
+
+				if (nodeToSelect != null)
+				{
+					treeView.SelectedNode = nodeToSelect;
+					selectedTreeItem = (CustomTreeNode)treeView.SelectedNode;
+					nodeToSelect.Expand();
+					RefreshText();
 				}
 			}
 		}

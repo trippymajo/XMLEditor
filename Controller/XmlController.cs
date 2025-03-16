@@ -113,7 +113,7 @@ namespace XMLEditor.Controller
                 lastAction.Parent.Add(new XElement(lastAction.Node));
 
                 _model.SaveXml(_model._filePath);
-                _view.RefreshText();
+                _view.RefreshTree(_model.GetRoot());
             }
         }
 
@@ -132,7 +132,7 @@ namespace XMLEditor.Controller
                 lastAction.Parent.Add(new XElement(lastAction.Node));
 
                 _model.SaveXml(_model._filePath);
-                _view.RefreshText();
+                _view.RefreshTree(_model.GetRoot());
             }
         }
     }
