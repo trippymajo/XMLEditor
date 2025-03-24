@@ -16,12 +16,11 @@ namespace XMLEditor
 			Application.SetCompatibleTextRenderingDefault(false);
 
 			var services = new ServiceCollection();
-			services.AddSingleton<IXmlModel, XmlModel>();
-			services.AddSingleton<IXmlController, XmlController>();
-			services.AddTransient<MainForm>();
-			services.AddTransient<IControlsActions>(sp => sp.GetRequiredService<MainForm>());
+            services.AddSingleton<IXmlModel, XmlModel>();
+            services.AddSingleton<IXmlController, XmlController>();
+            services.AddTransient<MainForm>();
 
-			var serviceProvider = services.BuildServiceProvider();
+            var serviceProvider = services.BuildServiceProvider();
 
 			Application.Run(serviceProvider.GetRequiredService<MainForm>());
 		}

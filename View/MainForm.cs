@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using XMLEditor.Controller;
@@ -8,24 +7,9 @@ using XMLEditor.ViewModel;
 
 namespace XMLEditor.View
 {
-	public interface IControlsActions
+	public partial class MainForm : Form
 	{
-		void LoadXmlTreeView(XElement elemRoot);
-		void RefreshText();
-
-		/// <summary>
-		/// Refreshes the tree restoring last expanded and selected item
-		/// </summary>
-		/// <param name="elemRoot">Root element of the document</param>
-		void RefreshTree(XElement elemRoot);
-	}
-
-	public partial class MainForm : Form, IControlsActions
-	{
-		// Varibales:
-		private const int MAX_HISTORY = 50;
-		private string filePath = string.Empty;
-		//private CustomTreeNode root = new CustomTreeNode();
+		private readonly IXmlController _controller;
 		private CustomTreeNode selectedTreeItem = null;
 		private ListViewItemSelectionChangedEventArgs selectedListViewItem = null;
 
@@ -37,8 +21,8 @@ namespace XMLEditor.View
 
 		public MainForm(IXmlController controller)
 		{
+			_controller = controller ?? throw new ArgumentNullException(nameof(controller));
 			InitializeComponent();
-			_controller = controller;
 		}
 
 		private bool isIgnored(string xElementName) => IgnoredElements.Contains(xElementName);
@@ -56,7 +40,7 @@ namespace XMLEditor.View
 			}
 		}
 
-		public void LoadXmlTreeView(XElement elemRoot)
+		private void LoadXmlTreeView(XElement elemRoot)
 		{
 			if (elemRoot == null)
 				return;
@@ -77,13 +61,20 @@ namespace XMLEditor.View
 			openFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 			{
-				_controller.OpenXmlDoc(openFileDialog.FileName);
+				if (_controller == null)
+					throw new ArgumentNullException(nameof(_controller));
+
+				var root = _controller.OpenXmlDoc(openFileDialog.FileName);
+				LoadXmlTreeView(root);
 			}
 		}
 
 		private void EditBtn_Click(object sender, EventArgs e)
 		{
-			if (_controller == null || selectedListViewItem == null)
+			if (_controller == null)
+				throw new ArgumentNullException(nameof(_controller));
+
+			if (selectedListViewItem == null)
 			{
 				inputBox.Clear();
 				return;
@@ -92,6 +83,7 @@ namespace XMLEditor.View
 			if (selectedListViewItem.Item.SubItems[0].Text.ToLower().Equals("<text>"))
 			{
 				_controller.UpdateTextVal(selectedTreeItem.XElement, inputBox.Text);
+				RefreshText();
 			}
 			else
 			{
@@ -104,10 +96,11 @@ namespace XMLEditor.View
 					namespaceNameAttr = selectedListViewItem.Item.SubItems[0].Text;
 
 				_controller.UpdateTextAttr(selectedTreeItem.XElement, namespaceNameAttr, inputBox.Text);
+				RefreshText();
 			}
 		}
 
-		public void RefreshText()
+		private void RefreshText()
 		{
 			listView.Items.Clear();
 			ListViewItem item = null;
@@ -131,15 +124,15 @@ namespace XMLEditor.View
 			}
 		}
 
-        /// <summary>
-        /// DFS search of the Node in treeView by provided path array
-        /// </summary>
-        /// <param name="nodes">Node to search in</param>
-        /// <param name="pathArray">Path to the node to find</param>
-        /// <param name="level">Current level of the Tree</param>
-        /// <returns>TreeNode found by path</returns>
-        /// <return>[null] - TreeNode was not found</return>
-        private TreeNode FindNode(TreeNodeCollection nodes, string[] pathArray, int level)
+		/// <summary>
+		/// DFS search of the Node in treeView by provided path array
+		/// </summary>
+		/// <param name="nodes">Node to search in</param>
+		/// <param name="pathArray">Path to the node to find</param>
+		/// <param name="level">Current level of the Tree</param>
+		/// <returns>TreeNode found by path</returns>
+		/// <return>[null] - TreeNode was not found</return>
+		private TreeNode FindNode(TreeNodeCollection nodes, string[] pathArray, int level)
 		{
 			foreach (TreeNode node in nodes)
 			{
@@ -154,7 +147,7 @@ namespace XMLEditor.View
 			return null;
 		}
 
-		public void RefreshTree(XElement elemRoot)
+		private void RefreshTree(XElement elemRoot)
 		{
 			string nodeFullPath = null;
 
@@ -201,17 +194,23 @@ namespace XMLEditor.View
 		private void UndoBttn_Click(object sender, EventArgs e)
 		{
 			if (_controller == null)
-				return;
+				throw new ArgumentNullException(nameof(_controller));
 
-			_controller.Undo();
+			var root = _controller.Undo();
+
+			if (root != null)
+				RefreshTree(root);
 		}
 
 		private void RedoBttn_Click(object sender, EventArgs e)
 		{
 			if (_controller == null)
-				return;
+				throw new ArgumentNullException(nameof(_controller));
 
-			_controller.Redo();
+			var root = _controller.Redo();
+
+			if (root != null)
+				RefreshTree(root);
 		}
 	}
 }

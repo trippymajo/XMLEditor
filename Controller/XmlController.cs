@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using XMLEditor.Model;
-using XMLEditor.View;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 
 namespace XMLEditor.Controller
@@ -18,7 +12,8 @@ namespace XMLEditor.Controller
         /// Open current XML document, load model and load into tree view
         /// </summary>
         /// <param name="fileName">Path to XML document</param>
-        void OpenXmlDoc(string fileName);
+        /// <returns>Root of the opened document</returns>
+        XElement OpenXmlDoc(string fileName);
 
         /// <summary>
         /// Update text value of the selected element,
@@ -40,12 +35,18 @@ namespace XMLEditor.Controller
         /// <summary>
         /// Undo the last change in the whole Xml tree, refresh the view
         /// </summary>
-        void Undo();
+        /// <returns>
+        /// Root of the opened document. Null if nothing to Undo
+        /// </returns>
+        XElement Undo();
 
         /// <summary>
         /// Redo the last change in the whole Xml tree, refresh the view
         /// </summary>
-        void Redo();
+        /// <returns>
+        /// Root of the opened document. Null if nothing to Redo
+        /// </returns>
+        XElement Redo();
     }
 
     public class XmlController : IXmlController
@@ -53,22 +54,20 @@ namespace XMLEditor.Controller
         private const short MAX_UR_HISTORY = 50;
 
         private readonly IXmlModel _model;
-        private readonly IControlsActions _view;
 
         private Stack<UndoRedo> _undoStack = new Stack<UndoRedo>();
         private Stack<UndoRedo> _redoStack = new Stack<UndoRedo>();
 
 
-        public XmlController(IXmlModel view, IXmlModel model)
+        public XmlController(IXmlModel model)
         {
-            _view = view;
             _model = model;
         }
 
-        public void OpenXmlDoc(string fileName)
+        public XElement OpenXmlDoc(string fileName)
         {
             _model.LoadXml(fileName);
-            _view.LoadXmlTreeView(_model.GetRoot());
+            return _model.GetRoot();
         }
 
         public void UpdateTextVal(XElement element, string newText)
@@ -91,7 +90,6 @@ namespace XMLEditor.Controller
 
             _model.UpdateTextVal(element, newText);
             _model.SaveXml(_model._filePath);
-            _view.RefreshText();
         }
 
         public void UpdateTextAttr(XElement element, XName name, string newText)
@@ -114,10 +112,9 @@ namespace XMLEditor.Controller
 
             _model.UpdateTextAttr(element, name, newText);
             _model.SaveXml(_model._filePath);
-            _view.RefreshText();
         }
 
-        public void Undo()
+        public XElement Undo()
         {
             if (_undoStack.Count > 0)
             {
@@ -129,11 +126,12 @@ namespace XMLEditor.Controller
                 lastAction.Parent.Add(new XElement(lastAction.Node));
 
                 _model.SaveXml(_model._filePath);
-                _view.RefreshTree(_model.GetRoot());
+                return _model.GetRoot();
             }
+            return null;
         }
 
-        public void Redo()
+        public XElement Redo()
         {
             if (_redoStack.Count > 0)
             {
@@ -145,8 +143,9 @@ namespace XMLEditor.Controller
                 lastAction.Parent.Add(new XElement(lastAction.Node));
 
                 _model.SaveXml(_model._filePath);
-                _view.RefreshTree(_model.GetRoot());
+                return _model.GetRoot();
             }
+            return null;
         }
     }
 
