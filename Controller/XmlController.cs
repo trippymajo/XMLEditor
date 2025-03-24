@@ -12,32 +12,13 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace XMLEditor.Controller
 {
-    public class XmlController
+    public interface IXmlController
     {
-        private const short MAX_UR_HISTORY = 50;
-
-        private readonly XmlModel _model;
-        private readonly MainForm _view;
-
-        private Stack<UndoRedo> _undoStack = new Stack<UndoRedo>();
-        private Stack<UndoRedo> _redoStack = new Stack<UndoRedo>();
-
-
-        public XmlController(MainForm view)
-        {
-            _view = view;
-            _model = new XmlModel();
-        }
-
         /// <summary>
         /// Open current XML document, load model and load into tree view
         /// </summary>
         /// <param name="fileName">Path to XML document</param>
-        public void OpenXmlDoc(string fileName)
-        {
-            _model.LoadXml(fileName);
-            _view.LoadXmlTreeView(_model.GetRoot());
-        }
+        void OpenXmlDoc(string fileName);
 
         /// <summary>
         /// Update text value of the selected element,
@@ -45,6 +26,51 @@ namespace XMLEditor.Controller
         /// </summary>
         /// <param name="element">Current element</param>
         /// <param name="newText">New text to paste in the element</param>
+        void UpdateTextVal(XElement element, string newText);
+
+        /// <summary>
+        /// Update text attribute of the selected element,
+        /// store undo history and force to refresh the view
+        /// </summary>
+        /// <param name="element">Current element</param>
+        /// <param name="name">Name of the namespace attribute</param>
+        /// <param name="newText">New text to paste in the element</param>
+        void UpdateTextAttr(XElement element, XName name, string newText);
+
+        /// <summary>
+        /// Undo the last change in the whole Xml tree, refresh the view
+        /// </summary>
+        void Undo();
+
+        /// <summary>
+        /// Redo the last change in the whole Xml tree, refresh the view
+        /// </summary>
+        void Redo();
+    }
+
+    public class XmlController : IXmlController
+    {
+        private const short MAX_UR_HISTORY = 50;
+
+        private readonly IXmlModel _model;
+        private readonly IControlsActions _view;
+
+        private Stack<UndoRedo> _undoStack = new Stack<UndoRedo>();
+        private Stack<UndoRedo> _redoStack = new Stack<UndoRedo>();
+
+
+        public XmlController(IXmlModel view, IXmlModel model)
+        {
+            _view = view;
+            _model = model;
+        }
+
+        public void OpenXmlDoc(string fileName)
+        {
+            _model.LoadXml(fileName);
+            _view.LoadXmlTreeView(_model.GetRoot());
+        }
+
         public void UpdateTextVal(XElement element, string newText)
         {
             XElement parent = element.Parent;
@@ -68,13 +94,6 @@ namespace XMLEditor.Controller
             _view.RefreshText();
         }
 
-        /// <summary>
-        /// Update text attribute of the selected element,
-        /// store undo history and force to refresh the view
-        /// </summary>
-        /// <param name="element">Current element</param>
-        /// <param name="name">Name of the namespace attribute</param>
-        /// <param name="newText">New text to paste in the element</param>
         public void UpdateTextAttr(XElement element, XName name, string newText)
         {
             XElement parent = element.Parent;
@@ -98,9 +117,6 @@ namespace XMLEditor.Controller
             _view.RefreshText();
         }
 
-        /// <summary>
-        /// Undo the last change in the whole Xml tree, refresh the view
-        /// </summary>
         public void Undo()
         {
             if (_undoStack.Count > 0)
@@ -117,9 +133,6 @@ namespace XMLEditor.Controller
             }
         }
 
-        /// <summary>
-        /// Redo the last change in the whole Xml tree, refresh the view
-        /// </summary>
         public void Redo()
         {
             if (_redoStack.Count > 0)

@@ -8,10 +8,20 @@ using XMLEditor.ViewModel;
 
 namespace XMLEditor.View
 {
-	public partial class MainForm : Form
+	public interface IControlsActions
 	{
-		private XmlController _controller = null;
+		void LoadXmlTreeView(XElement elemRoot);
+		void RefreshText();
 
+		/// <summary>
+		/// Refreshes the tree restoring last expanded and selected item
+		/// </summary>
+		/// <param name="elemRoot">Root element of the document</param>
+		void RefreshTree(XElement elemRoot);
+	}
+
+	public partial class MainForm : Form, IControlsActions
+	{
 		// Varibales:
 		private const int MAX_HISTORY = 50;
 		private string filePath = string.Empty;
@@ -25,10 +35,10 @@ namespace XMLEditor.View
 			"DialogBoxLauncher", "RibbonPanelBreak", "RibbonTabSelectors"
 		};
 
-		public MainForm()
+		public MainForm(IXmlController controller)
 		{
 			InitializeComponent();
-			_controller = new XmlController(this);
+			_controller = controller;
 		}
 
 		private bool isIgnored(string xElementName) => IgnoredElements.Contains(xElementName);
@@ -144,10 +154,6 @@ namespace XMLEditor.View
 			return null;
 		}
 
-		/// <summary>
-		/// Refreshes the tree restoring last expanded and selected item
-		/// </summary>
-		/// <param name="elemRoot">Root element of the document</param>
 		public void RefreshTree(XElement elemRoot)
 		{
 			string nodeFullPath = null;

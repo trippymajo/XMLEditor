@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Forms;
+using XMLEditor.Model;
+using XMLEditor.Controller;
+using XMLEditor.View;
 
 namespace XMLEditor
 {
@@ -13,7 +14,16 @@ namespace XMLEditor
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new XMLEditor.View.MainForm());
+
+			var services = new ServiceCollection();
+			services.AddSingleton<IXmlModel, XmlModel>();
+			services.AddSingleton<IXmlController, XmlController>();
+			services.AddTransient<MainForm>();
+			services.AddTransient<IControlsActions>(sp => sp.GetRequiredService<MainForm>());
+
+			var serviceProvider = services.BuildServiceProvider();
+
+			Application.Run(serviceProvider.GetRequiredService<MainForm>());
 		}
 
 	}
